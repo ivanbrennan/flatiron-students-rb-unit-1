@@ -1,6 +1,8 @@
 require 'pry'
 require 'awesome_print'
 require 'erb'
+require 'nokogiri'
+require 'open-uri'
 
 ProjectRoot ||= "#{File.dirname(__FILE__)}/.."
 
