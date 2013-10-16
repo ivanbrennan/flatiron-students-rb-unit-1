@@ -5,6 +5,15 @@ class Student
   attr_accessor :name, :twitter, :linkedin, :facebook, :website
   attr_reader :id
 
+  ATTRIBUTES_HASH = {
+    :id => "INTEGER PRIMARY KEY AUTOINCREMENT",
+    :name => "TEXT",
+    :twitter => "TEXT",
+    :linkedin => "TEXT",
+    :facebook => "TEXT",
+    :website => "TEXT"
+  }
+
   @@students = []
 
   @@db = SQLite3::Database.new('students.db')
@@ -28,6 +37,16 @@ class Student
 
   def self.all
     @@students
+  end
+
+  def self.db_reset
+    sql = "DROP TABLE IF EXISTS students"
+    @@db.execute(sql)
+    create = "CREATE TABLE IF NOT EXISTS students(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
+  end
+
+  def self.attributes_for_db
+    ATTRIBUTES_HASH.keys.reject {|k| k == :id}
   end
 
   def self.find_by_name(name)

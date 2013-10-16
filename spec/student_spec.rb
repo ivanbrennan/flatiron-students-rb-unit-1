@@ -1,3 +1,5 @@
+require_relative './spec_helper'
+
 describe Student do
   context "database operations" do
     before(:each) do
@@ -73,6 +75,7 @@ describe "Student" do
           student.send("#{attribute}=", "Testing #{attribute}")
         end
         student.save
+          binding.pry
 
         test_student = Student.find(student.id)
 
