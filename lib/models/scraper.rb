@@ -14,15 +14,11 @@ class Scraper
     name = scrape_name
     title_pic = scrape_title_pic
     profile_pic = scrape_profile_pic
-    big_name = scrape_
-
-    # profile picture, big name,
-    # twitter, linkedin, github, rss, quote,
-    # about
-    # 'coder cred' section
-    # 'recently' section
-    # 'favorites' section
-    # SCRAPE
+    twitter = scrape_twitter
+    linkedin = scrape_linkedin
+    github = scrape_github
+    quote = scrape_quote
+    about = scrape_about
   end
 
   def self.scrape_name
@@ -34,8 +30,30 @@ class Scraper
   end
 
   def self.scrape_profile_pic
-    "http://www.students.flatironschool.com/#{@noko_doc.css('img.student_pic').attr('src').text}"
+    "http://www.students.flatironschool.com/#{(@noko_doc.css('img.student_pic').attribute('src').text)[3..-1]}"
   end
+
+  def self.scrape_twitter
+    @noko_doc.css('div.social-icons a')[0].attribute('href').to_s
+  end
+
+  def self.scrape_linkedin
+    @noko_doc.css('div.social-icons a')[1].attribute('href').to_s
+  end
+
+  def self.scrape_github
+    @noko_doc.css('div.social-icons a')[2].attribute('href').to_s
+  end
+
+  def self.scrape_quote
+    @noko_doc.css('.quote-div h3').text
+  end
+
+  def self.scrape_about
+    ### NOT WORKING ###
+    @noko_doc.css('div#scroll-about div.ok-text-column').to_s
+  end
+
 end
 
 Scraper.scrape_student
