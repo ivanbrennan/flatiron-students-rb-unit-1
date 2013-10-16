@@ -4,6 +4,7 @@ describe Student do
   context "database operations" do
     before(:each) do
       Student.reset_all
+      Student.db_reset
       @student = Student.new.tap { |s| s.name = "Anything But Scott Oh Nevermind" }
     end
 
@@ -57,6 +58,7 @@ describe "Student" do
 
   before(:each) do
     Student.reset_all
+    Student.db_reset
   end
 
   it "can be instantiated" do
@@ -69,13 +71,13 @@ describe "Student" do
   describe "student properties" do
     let(:student) { Student.new }
 
+
     context 'creating a new student' do
       it 'has properties based on an attributes hash' do
         Student.attributes_for_db.each do |attribute|
           student.send("#{attribute}=", "Testing #{attribute}")
         end
         student.save
-          binding.pry
 
         test_student = Student.find(student.id)
 
@@ -137,6 +139,7 @@ describe "Student" do
 
     before(:each) do
       Student.reset_all
+      Student.db_reset
     end
 
     it "has an ID" do
@@ -175,6 +178,7 @@ describe "Student", "finders" do
   
   before(:each) do
     Student.reset_all
+    Student.db_reset
   end
 
   it 'has a finder for every attribute' do

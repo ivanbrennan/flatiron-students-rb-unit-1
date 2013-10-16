@@ -17,8 +17,16 @@ class Student
   @@students = []
 
   @@db = SQLite3::Database.new('students.db')
-  create = "CREATE TABLE IF NOT EXISTS students(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
-  @@db.execute(create)
+
+  def self.att_hash_to_sql_schema
+    ATTRIBUTES_HASH.to_a.map {|a| a.join(" ")}.join(", ")
+  end
+
+  def self.create_sql
+    "CREATE TABLE IF NOT EXISTS students(#{self.att_hash_to_sql_schema})"
+  end
+
+  @@db.execute(self.create_sql)
 
   def get_newest_id
     sql = "SELECT MAX(id) FROM students"
@@ -42,7 +50,7 @@ class Student
   def self.db_reset
     sql = "DROP TABLE IF EXISTS students"
     @@db.execute(sql)
-    create = "CREATE TABLE IF NOT EXISTS students(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
+    @@db.execute(create_sql)
   end
 
   def self.attributes_for_db
@@ -53,6 +61,31 @@ class Student
     @@students.select { |s| s.name == name }
   end
 
+  def self.attributes
+    ATTRIBUTES_HASH.keys
+  end
+
+  self.attributes_for_db.each do |attr_name|
+    define_method("#{attr_name}=") do |value|
+      instance_variable_set("@" + attr_name.to_s, value)
+    end
+  end
+
+  self.attributes.each do |attr_name|
+    define_singleton_method("find_by_#{attr_name}") do |value|
+      sql = "SELECT * FROM students WHERE #{attr_name} = ?"
+      found = @@db.execute(sql, value).collect { |row| self.new_from_row(row)}
+    end
+  end
+
+  def self.new_from_row(row)
+    student = Student.new(row.flatten[0])
+    attributes_for_db.each_with_index do |attr_name, i|
+      student.send("#{attr_name}=", row.flatten[i+1])
+    end
+    student
+  end
+
   def set_id(db_id)
     @id = db_id
   end
@@ -61,12 +94,20 @@ class Student
     sql = "SELECT * FROM students WHERE id = ?"
     row = @@db.execute(sql, id)
     found = Student.new(row.flatten[0])
-    found.name = row.flatten[1]
+    attributes_for_db.each_with_index do |attr_name, i|
+      found.send("#{attr_name}=", row.flatten[i+1])
+    end
     found
+  end
+
+  def delete
+    self.class.delete(self.id)
   end
 
   def self.delete(id)
     @@students.reject! { |s| s.id == id}
+    sql = "DELETE FROM students WHERE id = ?"
+    @@db.execute(sql,id)
   end
 
   def saved?
@@ -83,14 +124,30 @@ class Student
   end
 
   def insert
-    sql = "INSERT INTO students (name) VALUES (?)"
-    @@db.execute(sql, self.name)
+    sql = "INSERT INTO students (#{self.class.column_names}) VALUES (#{self.class.question_marks_for_update})"
+    @@db.execute(sql, self.column_values)
     @saved = true
   end
 
+  def self.column_names
+    attributes_for_db.map { |attribute_name| attribute_name.to_s }.join(",")
+  end
+
+  def self.question_marks_for_update
+    (["?"] * attributes_for_db.size).join(",")
+  end
+
+  def self.sql_for_update
+    self.attributes_for_db.map { |attribute_name| "#{attribute_name}= ?"}.join(",")
+  end
+
+  def column_values
+    self.class.attributes_for_db.map { |attribute_name| self.send(attribute_name)}
+  end
+
   def update
-    sql = "UPDATE students SET name = ? WHERE id = ?"
-    @@db.execute(sql, self.name, self.id)
+    sql = "UPDATE students SET #{self.class.sql_for_update} WHERE id = ?"
+    @@db.execute(sql, self.column_values, self.id)
     true
   end
 
