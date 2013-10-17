@@ -8,7 +8,7 @@ class Scraper
   @@index_url = "http://students.flatironschool.com"
 
   def self.scrape_student(url=nil)
-    @noko_doc = Nokogiri::HTML(File.open("resources/raymond_gan.html"))
+    @noko_doc = Nokogiri::HTML(File.open("resources/david_bella.html"))
     # will scrape a page, get the attributes we want,
     # and put them into a Student.new
     name = scrape_name
@@ -18,7 +18,8 @@ class Scraper
     linkedin = scrape_linkedin
     github = scrape_github
     quote = scrape_quote
-    about = scrape_about
+    main_content = scrape_main_content
+    binding.pry
   end
 
   def self.scrape_name
@@ -49,11 +50,8 @@ class Scraper
     @noko_doc.css('.quote-div h3').text
   end
 
-  def self.scrape_about
-    ### NOT WORKING ###
-    @noko_doc.css('div#scroll-about div.ok-text-column').to_s
+  def self.scrape_main_content
+    @noko_doc.css('div.this-div-is-just-a-helpful-container').to_s.gsub("\n", "")
   end
 
 end
-
-Scraper.scrape_student
