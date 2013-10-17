@@ -2,6 +2,8 @@ require_relative '../config/environment'
 
 class CLIStudent
 
+  include LoadStudents
+  
   def initialize(students)
     @students = students
     @on = true
@@ -15,23 +17,10 @@ class CLIStudent
     gets.strip
   end
 
-  def load_students
-    sql = "SELECT * FROM students"
-    @student_list = Student.db.execute(sql)
-    if @student_list.size == 0
-      IndexScraper.run
-      Scraper.scrape_student
-    end
-
-    Student.reset_all
-    @student_list.each do |student|
-      Student.new_from_row(student)
-    end
-  end
-
   def call
     load_students
     system('clear')
+    puts IndexScraper.msg
     puts "#{Student.all.size} students loaded."
     print "Type a command ('help' for help): "
     while self.on?

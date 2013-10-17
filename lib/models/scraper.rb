@@ -31,7 +31,7 @@ class Scraper
   end
 
   def self.scrape_profile_pic
-    "http://www.students.flatironschool.com/#{(@noko_doc.css('img.student_pic').attribute('src').text)[3..-1]}"
+    @noko_doc.css('img.student_pic').attribute('src').text
   end
 
   def self.scrape_twitter

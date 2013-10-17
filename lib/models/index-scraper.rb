@@ -3,8 +3,16 @@ require_relative '../../config/environment'
 class IndexScraper
 
   # scrape students index page
-  @@students_index = Nokogiri::HTML(open("http://students.flatironschool.com"))
+  begin
+    @@msg = "Loading data..."
+    @@students_index = Nokogiri::HTML(open("http://students.flatironschool.com"))
+  rescue
+    @@msg = "Internet down or some other funky shiz"
+  end
 
+  def self.msg
+    @@msg
+  end
 
   def self.run
     get_names

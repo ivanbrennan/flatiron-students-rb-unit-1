@@ -99,11 +99,11 @@
             <ul>
 
                <!-- Begin Student -->
-               <% Students.all.each do |student|%>
+              <% Student.all.each do |student|%>
               <li class="home-blog-post">
                 <div class="blog-thumb">
                   <a href="<%= student.url %>">
-                    <img width="304" height="304" class="prof-image" src="<%= student.index_pic %>" class="attachment-blog-thumb wp-post-image" alt="student_name">
+                    <img width="304" height="304" class="prof-image" src="<%= student.index_img %>" class="attachment-blog-thumb wp-post-image" alt="student_name">
                   </a>
                 </div>
 
