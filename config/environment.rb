@@ -1,6 +1,7 @@
 require 'pry'
 require 'awesome_print'
 require 'erb'
+require 'sqlite3'
 require 'nokogiri'
 require 'open-uri'
 

@@ -5,21 +5,21 @@ class Scraper
   # get each student URL from index page
   # 
 
-  @@index_url = "http://students.flatironschool.com"
+  @@index_url = "http://students.flatironschool.com/"
 
-  def self.scrape_student(url=nil)
-    @noko_doc = Nokogiri::HTML(File.open("resources/david_bella.html"))
-    # will scrape a page, get the attributes we want,
-    # and put them into a Student.new
-    name = scrape_name
-    title_pic = scrape_title_pic
-    profile_pic = scrape_profile_pic
-    twitter = scrape_twitter
-    linkedin = scrape_linkedin
-    github = scrape_github
-    quote = scrape_quote
-    main_content = scrape_main_content
-    binding.pry
+  def self.scrape_student
+    Student.all.each do |student|
+      @noko_doc = Nokogiri::HTML(open("#{@@index_url}#{student.url}"))
+      student.name = scrape_name
+      student.title_pic = scrape_title_pic
+      student.profile_pic = scrape_profile_pic
+      student.twitter = scrape_twitter
+      student.linkedin = scrape_linkedin
+      student.github = scrape_github
+      student.quote = scrape_quote
+      student.main_content = scrape_main_content
+      student.save
+    end
   end
 
   def self.scrape_name

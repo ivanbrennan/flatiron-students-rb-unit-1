@@ -1,22 +1,31 @@
-require 'sqlite3'
-require 'pry'
+require_relative '../../config/environment'
 
 class Student
-  attr_accessor :name, :twitter, :linkedin, :facebook, :website
   attr_reader :id
 
   ATTRIBUTES_HASH = {
     :id => "INTEGER PRIMARY KEY AUTOINCREMENT",
     :name => "TEXT",
+    :title_pic => "TEXT",
+    :profile_pic => "TEXT",
     :twitter => "TEXT",
     :linkedin => "TEXT",
-    :facebook => "TEXT",
-    :website => "TEXT"
+    :github => "TEXT",
+    :quote => "TEXT",
+    :main_content => "TEXT",
+    :tag => "TEXT",
+    :excerpt => "TEXT",
+    :index_img => "TEXT",
+    :url => "TEXT"
   }
 
   @@students = []
 
-  @@db = SQLite3::Database.new('students.db')
+  @@db = SQLite3::Database.new("#{ProjectRoot}/db/students.db")
+
+  def self.db
+    @@db
+  end
 
   def self.att_hash_to_sql_schema
     ATTRIBUTES_HASH.to_a.map {|a| a.join(" ")}.join(", ")
@@ -68,6 +77,12 @@ class Student
   self.attributes_for_db.each do |attr_name|
     define_method("#{attr_name}=") do |value|
       instance_variable_set("@" + attr_name.to_s, value)
+    end
+  end
+
+  self.attributes_for_db.each do |attr_name|
+    define_method("#{attr_name}") do
+      instance_variable_get("@#{attr_name}")
     end
   end
 
