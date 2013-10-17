@@ -51,7 +51,7 @@ class Scraper
   end
 
   def self.scrape_main_content
-    @noko_doc.css('div.this-div-is-just-a-helpful-container').to_s.gsub("\n", "")
+    @noko_doc.css('div.container div.this-div-is-just-a-helpful-container').first.to_s.gsub("\n", "")
   end
 
 end
